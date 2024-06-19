@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Zach Hedeen" />
+
+<meta name="date" content="2024-06-12" />
+
+<title>Data Processing: Water</title>
+
+<script src="site_libs/header-attrs-2.27/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/sandstone.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-6.4.2/css/all.min.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Zach Hedeen</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About</a>
+</li>
+<li>
+  <a href="resume.html">Résumé</a>
+</li>
+<li>
+  <a href="Core_Values.html">Core Values</a>
+</li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Code
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li class="dropdown-header">Rowing</li>
+    <li>
+      <a href="water_data_processing.html">Data Processing: Water</a>
+    </li>
+    <li class="divider"></li>
+    <li class="dropdown-header">Critical Role</li>
+    <li>
+      <a href="vm_TheNearlyImpossible.html">The Nearly Impossible (C1)</a>
+    </li>
+  </ul>
+</li>
+<li>
+  <a href="recommended_reading.html">Recommended Reading</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="mailto:&lt;hedeenza@gmail.com&gt;">
+    <span class="fa fa-envelope fa-2x"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="https://github.com/hedeenza/">
+    <span class="fa fa-github fa-2x"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="https://www.linkedin.com/in/zachary-hedeen">
+    <span class="fa fa-linkedin-square fa-2x"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Data Processing: Water</h1>
+<h4 class="author">Zach Hedeen</h4>
+<h4 class="date">2024-06-12</h4>
+
+</div>
+
+
+<style type="text/css">
+pre {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+pre[class] {
+  max-height:100px;
+}
+</style>
+<div id="csvs-and-averages-offer-some-insight" class="section level1">
+<h1>1. CSVs and Averages Offer some insight</h1>
+<p>  The CSVs we can get from the NK Link Logbook have a wealth of
+information, but they aren’t very readable as is. We can see the
+cumulative information for each metric in the top lines, which can be
+good for a representation of the piece, but with 200 - 250 strokes in a
+2K race, it is far from telling the full story. We can look further down
+the table, but unless we’re looking for the metrics for a particular
+stroke, there’s not a lot we can glean. We need to process the whole
+story into a more readable form.</p>
+<p><img src="Raw_CSV.jpg" width="100%" /></p>
+<hr />
+</div>
+<div id="packages" class="section level1">
+<h1>2. Packages</h1>
+<p>  Utilizing only a couple R packages, we can derive strong insights
+from the data we collected.</p>
+<pre class="r"><code>library(tidyverse) # To make sure we have everything we need to clean and visualize
+library(gt) # For the summary table
+library(gtExtras) # For the table theme</code></pre>
+<hr />
+</div>
+<div id="loading-water-data-into-r-adding-meta-data"
+class="section level1">
+<h1>3. Loading Water Data into R, Adding Meta-Data</h1>
+<p>  In order to examine multiple sessions or races at once, it’s
+beneficial to include meta-data so the strokes from each race can stay
+grouped together. I’ve included things like a specific ID tag, what boat
+this was, the date, interval type, interval number, and target
+values.</p>
+<hr />
+</div>
+<div id="tidying-the-data" class="section level1">
+<h1>4. Tidying the Data</h1>
+<p>  To join the data, it was necessary to rename a couple of the
+columns. At this point I added the meta-data to the main body of the
+stroke-by-stroke information. After that was done, I was able to combine
+all 10 of the races I had data for. With the master data frame created,
+there were 2,616 strokes of racing data to examine. To make the data
+more workable, I renamed each of the columns in the combined data frame.
+There are other metrics to examine, so I converted the 500 meter split
+into a format that would be easier to use, as well as the Effective Work
+per Stroke (a method of integrating Power, Speed, and Rate developed by
+<a
+href="https://www.biorow.com/RBN_en_2005_files/2005RowBiomNews10.pdf">Dr. Valery
+Kleshnev</a>). Once all the needed variables were calculated, I cut the
+table down into only the most relevant columns.</p>
+<hr />
+<div id="filtering-out-errors" class="section level2">
+<h2>5. Filtering Out Errors</h2>
+<p>  Upon initial viewing, most of the data collected from the Cox Box
+seems accurate, but sometimes, for one reason or another, there are
+values that are way off of what makes sense given the circumstances. In
+order to filter out the values that are presumed to be errors, it was
+necessary to establish “cut off” values for speed and rate. There may be
+considerable speed and rate variation even within a 2,000 meter race, so
+it was important not to make those cut offs too narrow around the
+averages, or important data points may be lost. I settled on a cut off
+of +/- 20 seconds on the split and +/- 10 strokes per minute on the
+rate.</p>
+<p>  After errors were filtered out, the data was grouped by piece ID,
+and the target metrics from the meta-data were added in. Standard
+deviation would also prove to be impactful, so it was calculated in this
+stage as well. A check was performed to determine whether any
+calculations had resulted in errors. None were found, so it was safe to
+move on.</p>
+<hr />
+</div>
+</div>
+<div id="make-a-summary-table" class="section level1">
+<h1>6. Make a Summary Table</h1>
+<p>  Using <code>gt</code> and <code>gtExtras</code> I created a table
+that allowed us to look at things numerically. In large part this was a
+recreation of the averages pulled from the cox box but with the errors
+removed.</p>
+<div id="uhwlhpskof" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>@import url("https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+#uhwlhpskof table {
+  font-family: Lato, system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#uhwlhpskof thead, #uhwlhpskof tbody, #uhwlhpskof tfoot, #uhwlhpskof tr, #uhwlhpskof td, #uhwlhpskof th {
+  border-style: none;
+}
+
+#uhwlhpskof p {
+  margin: 0;
+  padding: 0;
+}
+
+#uhwlhpskof .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 3px;
+  border-top-color: #FFFFFF;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#uhwlhpskof .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#uhwlhpskof .gt_title {
+  color: #333333;
+  font-size: 24px;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#uhwlhpskof .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#uhwlhpskof .gt_heading {
+  background-color: #FFFFFF;
+  text-align: left;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#uhwlhpskof .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#uhwlhpskof .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#uhwlhpskof .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 80%;
+  font-weight: bolder;
+  text-transform: uppercase;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#uhwlhpskof .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 80%;
+  font-weight: bolder;
+  text-transform: uppercase;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#uhwlhpskof .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#uhwlhpskof .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#uhwlhpskof .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#uhwlhpskof .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#uhwlhpskof .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #EDEDED;
+  font-size: 14px;
+  font-weight: bolder;
+  text-transform: uppercase;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#uhwlhpskof .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #EDEDED;
+  font-size: 14px;
+  font-weight: bolder;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#uhwlhpskof .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#uhwlhpskof .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#uhwlhpskof .gt_row {
+  padding-top: 7px;
+  padding-bottom: 7px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #F6F7F7;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#uhwlhpskof .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 80%;
+  font-weight: bolder;
+  text-transform: uppercase;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#uhwlhpskof .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#uhwlhpskof .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#uhwlhpskof .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#uhwlhpskof .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#uhwlhpskof .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#uhwlhpskof .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#uhwlhpskof .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#uhwlhpskof .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#uhwlhpskof .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#uhwlhpskof .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#uhwlhpskof .gt_striped {
+  background-color: #FAFAFA;
+}
+
+#uhwlhpskof .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#uhwlhpskof .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#uhwlhpskof .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#uhwlhpskof .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#uhwlhpskof .gt_sourcenote {
+  font-size: 12px;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#uhwlhpskof .gt_left {
+  text-align: left;
+}
+
+#uhwlhpskof .gt_center {
+  text-align: center;
+}
+
+#uhwlhpskof .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#uhwlhpskof .gt_font_normal {
+  font-weight: normal;
+}
+
+#uhwlhpskof .gt_font_bold {
+  font-weight: bold;
+}
+
+#uhwlhpskof .gt_font_italic {
+  font-style: italic;
+}
+
+#uhwlhpskof .gt_super {
+  font-size: 65%;
+}
+
+#uhwlhpskof .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#uhwlhpskof .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#uhwlhpskof .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#uhwlhpskof .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#uhwlhpskof .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#uhwlhpskof .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#uhwlhpskof .gt_indent_5 {
+  text-indent: 25px;
+}
+</style>
+<table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+  <thead>
+    <tr class="gt_heading">
+      <td colspan="12" class="gt_heading gt_title gt_font_normal" style>2K Racing on the Water</td>
+    </tr>
+    <tr class="gt_heading">
+      <td colspan="12" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style>University of Oregon | Spring 2024</td>
+    </tr>
+    <tr class="gt_col_headings gt_spanner_row">
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="2" colspan="1" scope="col" id="Race">Race</th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="3" scope="colgroup" id="Speed (m/s)">
+        <span class="gt_column_spanner">Speed (m/s)</span>
+      </th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="3" scope="colgroup" id="Split (/500m)">
+        <span class="gt_column_spanner">Split (/500m)</span>
+      </th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="2" scope="colgroup" id="Rate (s/m)">
+        <span class="gt_column_spanner">Rate (s/m)</span>
+      </th>
+      <th class="gt_center gt_columns_top_border gt_column_spanner_outer" rowspan="1" colspan="3" scope="colgroup" id="EWpS (J)">
+        <span class="gt_column_spanner">EWpS (J)</span>
+      </th>
+    </tr>
+    <tr class="gt_col_headings">
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="Mean">Mean</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="Std. Dev">Std. Dev</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="Target SD">Target SD</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="Mean">Mean</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="Std. Dev">Std. Dev</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="Target">Target</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="Mean">Mean</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="Std. Dev">Std. Dev</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="Mean">Mean</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="Std. Dev">Std. Dev</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="Target">Target</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr class="gt_group_heading_row">
+      <th colspan="12" class="gt_group_heading" scope="colgroup" id="MV4+">MV4+</th>
+    </tr>
+    <tr class="gt_row_group_first"><th id="stub_1_1" scope="row" class="gt_row gt_left gt_stub">1. CBR - a.m. 
+ (7:30.4)</th>
+<td headers="MV4+ stub_1_1 Mean_Speed" class="gt_row gt_center">4.47</td>
+<td headers="MV4+ stub_1_1 SD_Speed_perc" class="gt_row gt_center">4.7%</td>
+<td headers="MV4+ stub_1_1 SD_Speed_Target" class="gt_row gt_center">2.0%</td>
+<td headers="MV4+ stub_1_1 Mean_Split" class="gt_row gt_center">1:52.1</td>
+<td headers="MV4+ stub_1_1 SD_Split" class="gt_row gt_center">4.96</td>
+<td headers="MV4+ stub_1_1 Avg_Target_S" class="gt_row gt_center">1:40.0</td>
+<td headers="MV4+ stub_1_1 Mean_Rate" class="gt_row gt_center">33.8</td>
+<td headers="MV4+ stub_1_1 SD_Rate" class="gt_row gt_center">1.71</td>
+<td headers="MV4+ stub_1_1 Mean_EWpS" class="gt_row gt_center">445.4</td>
+<td headers="MV4+ stub_1_1 SD_EWpS" class="gt_row gt_center">48.14</td>
+<td headers="MV4+ stub_1_1 Target_EWpS" class="gt_row gt_center">586</td></tr>
+    <tr><th id="stub_1_2" scope="row" class="gt_row gt_left gt_stub">2. NWC - Grand Final 
+ (7:20.8)</th>
+<td headers="MV4+ stub_1_2 Mean_Speed" class="gt_row gt_center gt_striped">4.56</td>
+<td headers="MV4+ stub_1_2 SD_Speed_perc" class="gt_row gt_center gt_striped">3.7%</td>
+<td headers="MV4+ stub_1_2 SD_Speed_Target" class="gt_row gt_center gt_striped">2.0%</td>
+<td headers="MV4+ stub_1_2 Mean_Split" class="gt_row gt_center gt_striped">1:49.7</td>
+<td headers="MV4+ stub_1_2 SD_Split" class="gt_row gt_center gt_striped">3.84</td>
+<td headers="MV4+ stub_1_2 Avg_Target_S" class="gt_row gt_center gt_striped">1:40.0</td>
+<td headers="MV4+ stub_1_2 Mean_Rate" class="gt_row gt_center gt_striped">34.3</td>
+<td headers="MV4+ stub_1_2 SD_Rate" class="gt_row gt_center gt_striped">2.04</td>
+<td headers="MV4+ stub_1_2 Mean_EWpS" class="gt_row gt_center gt_striped">467.9</td>
+<td headers="MV4+ stub_1_2 SD_EWpS" class="gt_row gt_center gt_striped">42.62</td>
+<td headers="MV4+ stub_1_2 Target_EWpS" class="gt_row gt_center gt_striped">586</td></tr>
+    <tr><th id="stub_1_3" scope="row" class="gt_row gt_left gt_stub">3. WIRA - Heats 
+ (7:18.8)</th>
+<td headers="MV4+ stub_1_3 Mean_Speed" class="gt_row gt_center">4.59</td>
+<td headers="MV4+ stub_1_3 SD_Speed_perc" class="gt_row gt_center">3.7%</td>
+<td headers="MV4+ stub_1_3 SD_Speed_Target" class="gt_row gt_center">2.0%</td>
+<td headers="MV4+ stub_1_3 Mean_Split" class="gt_row gt_center">1:49.2</td>
+<td headers="MV4+ stub_1_3 SD_Split" class="gt_row gt_center">3.92</td>
+<td headers="MV4+ stub_1_3 Avg_Target_S" class="gt_row gt_center">1:40.0</td>
+<td headers="MV4+ stub_1_3 Mean_Rate" class="gt_row gt_center">34.9</td>
+<td headers="MV4+ stub_1_3 SD_Rate" class="gt_row gt_center">2.37</td>
+<td headers="MV4+ stub_1_3 Mean_EWpS" class="gt_row gt_center">466.9</td>
+<td headers="MV4+ stub_1_3 SD_EWpS" class="gt_row gt_center">48.53</td>
+<td headers="MV4+ stub_1_3 Target_EWpS" class="gt_row gt_center">586</td></tr>
+    <tr><th id="stub_1_4" scope="row" class="gt_row gt_left gt_stub">4. ACRAs - Reps 
+ (7:12.08)</th>
+<td headers="MV4+ stub_1_4 Mean_Speed" class="gt_row gt_center gt_striped" style="background-color: #FEE11A;">4.66</td>
+<td headers="MV4+ stub_1_4 SD_Speed_perc" class="gt_row gt_center gt_striped" style="background-color: #489D46;">3.2%</td>
+<td headers="MV4+ stub_1_4 SD_Speed_Target" class="gt_row gt_center gt_striped" style="background-color: #FEE11A;">2.0%</td>
+<td headers="MV4+ stub_1_4 Mean_Split" class="gt_row gt_center gt_striped" style="background-color: #FEE11A;">1:47.5</td>
+<td headers="MV4+ stub_1_4 SD_Split" class="gt_row gt_center gt_striped" style="background-color: #FEE11A;">3.24</td>
+<td headers="MV4+ stub_1_4 Avg_Target_S" class="gt_row gt_center gt_striped" style="background-color: #FEE11A;">1:40.0</td>
+<td headers="MV4+ stub_1_4 Mean_Rate" class="gt_row gt_center gt_striped" style="background-color: #FEE11A;">34.2</td>
+<td headers="MV4+ stub_1_4 SD_Rate" class="gt_row gt_center gt_striped" style="background-color: #FEE11A;">1.26</td>
+<td headers="MV4+ stub_1_4 Mean_EWpS" class="gt_row gt_center gt_striped" style="background-color: #FEE11A;">498.0</td>
+<td headers="MV4+ stub_1_4 SD_EWpS" class="gt_row gt_center gt_striped" style="background-color: #FEE11A;">41.05</td>
+<td headers="MV4+ stub_1_4 Target_EWpS" class="gt_row gt_center gt_striped" style="background-color: #FEE11A;">586</td></tr>
+    <tr><th id="summary_stub_MV4+_1" scope="row" class="gt_row gt_left gt_stub gt_summary_row gt_first_summary_row thick gt_last_summary_row">Average</th>
+<td headers="MV4+ summary_stub_MV4+_1 Mean_Speed" class="gt_row gt_center gt_summary_row gt_first_summary_row thick gt_last_summary_row">4.6</td>
+<td headers="MV4+ summary_stub_MV4+_1 SD_Speed_perc" class="gt_row gt_center gt_summary_row gt_first_summary_row thick gt_last_summary_row">3.8%</td>
+<td headers="MV4+ summary_stub_MV4+_1 SD_Speed_Target" class="gt_row gt_center gt_summary_row gt_first_summary_row thick gt_last_summary_row">2.0%</td>
+<td headers="MV4+ summary_stub_MV4+_1 Mean_Split" class="gt_row gt_center gt_summary_row gt_first_summary_row thick gt_last_summary_row">01:49</td>
+<td headers="MV4+ summary_stub_MV4+_1 SD_Split" class="gt_row gt_center gt_summary_row gt_first_summary_row thick gt_last_summary_row">4.0</td>
+<td headers="MV4+ summary_stub_MV4+_1 Avg_Target_S" class="gt_row gt_center gt_summary_row gt_first_summary_row thick gt_last_summary_row">01:40</td>
+<td headers="MV4+ summary_stub_MV4+_1 Mean_Rate" class="gt_row gt_center gt_summary_row gt_first_summary_row thick gt_last_summary_row">34.3</td>
+<td headers="MV4+ summary_stub_MV4+_1 SD_Rate" class="gt_row gt_center gt_summary_row gt_first_summary_row thick gt_last_summary_row">1.8</td>
+<td headers="MV4+ summary_stub_MV4+_1 Mean_EWpS" class="gt_row gt_center gt_summary_row gt_first_summary_row thick gt_last_summary_row">469.5</td>
+<td headers="MV4+ summary_stub_MV4+_1 SD_EWpS" class="gt_row gt_center gt_summary_row gt_first_summary_row thick gt_last_summary_row">45.1</td>
+<td headers="MV4+ summary_stub_MV4+_1 Target_EWpS" class="gt_row gt_center gt_summary_row gt_first_summary_row thick gt_last_summary_row">586.0</td></tr>
+    <tr class="gt_group_heading_row">
+      <th colspan="12" class="gt_group_heading" scope="colgroup" id="WN4+">WN4+</th>
+    </tr>
+    <tr class="gt_row_group_first"><th id="stub_1_5" scope="row" class="gt_row gt_left gt_stub">1. NWC - Grand Final 
+ (9:04.5)</th>
+<td headers="WN4+ stub_1_5 Mean_Speed" class="gt_row gt_center">3.68</td>
+<td headers="WN4+ stub_1_5 SD_Speed_perc" class="gt_row gt_center">4.3%</td>
+<td headers="WN4+ stub_1_5 SD_Speed_Target" class="gt_row gt_center">2.0%</td>
+<td headers="WN4+ stub_1_5 Mean_Split" class="gt_row gt_center">2:15.9</td>
+<td headers="WN4+ stub_1_5 SD_Split" class="gt_row gt_center">5.47</td>
+<td headers="WN4+ stub_1_5 Avg_Target_S" class="gt_row gt_center">1:57.0</td>
+<td headers="WN4+ stub_1_5 Mean_Rate" class="gt_row gt_center">31.0</td>
+<td headers="WN4+ stub_1_5 SD_Rate" class="gt_row gt_center">3.31</td>
+<td headers="WN4+ stub_1_5 Mean_EWpS" class="gt_row gt_center">274.6</td>
+<td headers="WN4+ stub_1_5 SD_EWpS" class="gt_row gt_center">38.68</td>
+<td headers="WN4+ stub_1_5 Target_EWpS" class="gt_row gt_center">387</td></tr>
+    <tr><th id="stub_1_6" scope="row" class="gt_row gt_left gt_stub">2. WIRA - Third Final 
+ (9:09.2)</th>
+<td headers="WN4+ stub_1_6 Mean_Speed" class="gt_row gt_center gt_striped">3.67</td>
+<td headers="WN4+ stub_1_6 SD_Speed_perc" class="gt_row gt_center gt_striped">4.4%</td>
+<td headers="WN4+ stub_1_6 SD_Speed_Target" class="gt_row gt_center gt_striped">2.0%</td>
+<td headers="WN4+ stub_1_6 Mean_Split" class="gt_row gt_center gt_striped">2:16.6</td>
+<td headers="WN4+ stub_1_6 SD_Split" class="gt_row gt_center gt_striped">6.02</td>
+<td headers="WN4+ stub_1_6 Avg_Target_S" class="gt_row gt_center gt_striped">1:57.0</td>
+<td headers="WN4+ stub_1_6 Mean_Rate" class="gt_row gt_center gt_striped">31.4</td>
+<td headers="WN4+ stub_1_6 SD_Rate" class="gt_row gt_center gt_striped">1.54</td>
+<td headers="WN4+ stub_1_6 Mean_EWpS" class="gt_row gt_center gt_striped">265.2</td>
+<td headers="WN4+ stub_1_6 SD_EWpS" class="gt_row gt_center gt_striped">33.40</td>
+<td headers="WN4+ stub_1_6 Target_EWpS" class="gt_row gt_center gt_striped">387</td></tr>
+    <tr><th id="stub_1_7" scope="row" class="gt_row gt_left gt_stub">3. ACRA - C Final 
+ (8:40.244)</th>
+<td headers="WN4+ stub_1_7 Mean_Speed" class="gt_row gt_center" style="background-color: #FEE11A;">3.87</td>
+<td headers="WN4+ stub_1_7 SD_Speed_perc" class="gt_row gt_center" style="background-color: #489D46;">3.6%</td>
+<td headers="WN4+ stub_1_7 SD_Speed_Target" class="gt_row gt_center" style="background-color: #FEE11A;">2.0%</td>
+<td headers="WN4+ stub_1_7 Mean_Split" class="gt_row gt_center" style="background-color: #FEE11A;">2:09.5</td>
+<td headers="WN4+ stub_1_7 SD_Split" class="gt_row gt_center" style="background-color: #FEE11A;">4.48</td>
+<td headers="WN4+ stub_1_7 Avg_Target_S" class="gt_row gt_center" style="background-color: #FEE11A;">1:57.0</td>
+<td headers="WN4+ stub_1_7 Mean_Rate" class="gt_row gt_center" style="background-color: #FEE11A;">32.6</td>
+<td headers="WN4+ stub_1_7 SD_Rate" class="gt_row gt_center" style="background-color: #FEE11A;">2.55</td>
+<td headers="WN4+ stub_1_7 Mean_EWpS" class="gt_row gt_center" style="background-color: #FEE11A;">300.7</td>
+<td headers="WN4+ stub_1_7 SD_EWpS" class="gt_row gt_center" style="background-color: #FEE11A;">38.77</td>
+<td headers="WN4+ stub_1_7 Target_EWpS" class="gt_row gt_center" style="background-color: #FEE11A;">387</td></tr>
+    <tr><th id="summary_stub_WN4+_1" scope="row" class="gt_row gt_left gt_stub gt_summary_row gt_first_summary_row thick gt_last_summary_row">Average</th>
+<td headers="WN4+ summary_stub_WN4+_1 Mean_Speed" class="gt_row gt_center gt_summary_row gt_first_summary_row thick gt_last_summary_row">3.7</td>
+<td headers="WN4+ summary_stub_WN4+_1 SD_Speed_perc" class="gt_row gt_center gt_summary_row gt_first_summary_row thick gt_last_summary_row">4.1%</td>
+<td headers="WN4+ summary_stub_WN4+_1 SD_Speed_Target" class="gt_row gt_center gt_summary_row gt_first_summary_row thick gt_last_summary_row">2.0%</td>
+<td headers="WN4+ summary_stub_WN4+_1 Mean_Split" class="gt_row gt_center gt_summary_row gt_first_summary_row thick gt_last_summary_row">02:14</td>
+<td headers="WN4+ summary_stub_WN4+_1 SD_Split" class="gt_row gt_center gt_summary_row gt_first_summary_row thick gt_last_summary_row">5.3</td>
+<td headers="WN4+ summary_stub_WN4+_1 Avg_Target_S" class="gt_row gt_center gt_summary_row gt_first_summary_row thick gt_last_summary_row">01:57</td>
+<td headers="WN4+ summary_stub_WN4+_1 Mean_Rate" class="gt_row gt_center gt_summary_row gt_first_summary_row thick gt_last_summary_row">31.7</td>
+<td headers="WN4+ summary_stub_WN4+_1 SD_Rate" class="gt_row gt_center gt_summary_row gt_first_summary_row thick gt_last_summary_row">2.5</td>
+<td headers="WN4+ summary_stub_WN4+_1 Mean_EWpS" class="gt_row gt_center gt_summary_row gt_first_summary_row thick gt_last_summary_row">280.2</td>
+<td headers="WN4+ summary_stub_WN4+_1 SD_EWpS" class="gt_row gt_center gt_summary_row gt_first_summary_row thick gt_last_summary_row">37.0</td>
+<td headers="WN4+ summary_stub_WN4+_1 Target_EWpS" class="gt_row gt_center gt_summary_row gt_first_summary_row thick gt_last_summary_row">387.0</td></tr>
+    <tr class="gt_group_heading_row">
+      <th colspan="12" class="gt_group_heading" scope="colgroup" id="MN8+">MN8+</th>
+    </tr>
+    <tr class="gt_row_group_first"><th id="stub_1_8" scope="row" class="gt_row gt_left gt_stub">1. NWC - Grand Final 
+ (7:49.0)</th>
+<td headers="MN8+ stub_1_8 Mean_Speed" class="gt_row gt_center gt_striped">4.35</td>
+<td headers="MN8+ stub_1_8 SD_Speed_perc" class="gt_row gt_center gt_striped">4.8%</td>
+<td headers="MN8+ stub_1_8 SD_Speed_Target" class="gt_row gt_center gt_striped">2.0%</td>
+<td headers="MN8+ stub_1_8 Mean_Split" class="gt_row gt_center gt_striped">1:55.2</td>
+<td headers="MN8+ stub_1_8 SD_Split" class="gt_row gt_center gt_striped">5.52</td>
+<td headers="MN8+ stub_1_8 Avg_Target_S" class="gt_row gt_center gt_striped">1:26.5</td>
+<td headers="MN8+ stub_1_8 Mean_Rate" class="gt_row gt_center gt_striped">33.3</td>
+<td headers="MN8+ stub_1_8 SD_Rate" class="gt_row gt_center gt_striped">1.86</td>
+<td headers="MN8+ stub_1_8 Mean_EWpS" class="gt_row gt_center gt_striped">417.5</td>
+<td headers="MN8+ stub_1_8 SD_EWpS" class="gt_row gt_center gt_striped">50.69</td>
+<td headers="MN8+ stub_1_8 Target_EWpS" class="gt_row gt_center gt_striped">866</td></tr>
+    <tr><th id="stub_1_9" scope="row" class="gt_row gt_left gt_stub">2. WIRA - Heats 
+ (7:25.8)</th>
+<td headers="MN8+ stub_1_9 Mean_Speed" class="gt_row gt_center">4.45</td>
+<td headers="MN8+ stub_1_9 SD_Speed_perc" class="gt_row gt_center" style="background-color: #489D46;">3.8%</td>
+<td headers="MN8+ stub_1_9 SD_Speed_Target" class="gt_row gt_center">2.0%</td>
+<td headers="MN8+ stub_1_9 Mean_Split" class="gt_row gt_center">1:52.5</td>
+<td headers="MN8+ stub_1_9 SD_Split" class="gt_row gt_center">4.31</td>
+<td headers="MN8+ stub_1_9 Avg_Target_S" class="gt_row gt_center">1:26.5</td>
+<td headers="MN8+ stub_1_9 Mean_Rate" class="gt_row gt_center">33.2</td>
+<td headers="MN8+ stub_1_9 SD_Rate" class="gt_row gt_center">1.31</td>
+<td headers="MN8+ stub_1_9 Mean_EWpS" class="gt_row gt_center">447.6</td>
+<td headers="MN8+ stub_1_9 SD_EWpS" class="gt_row gt_center">43.81</td>
+<td headers="MN8+ stub_1_9 Target_EWpS" class="gt_row gt_center">866</td></tr>
+    <tr><th id="stub_1_10" scope="row" class="gt_row gt_left gt_stub">3. WIRA - Petite Final 
+ (7:20.3)</th>
+<td headers="MN8+ stub_1_10 Mean_Speed" class="gt_row gt_center gt_striped" style="background-color: #FEE11A;">4.57</td>
+<td headers="MN8+ stub_1_10 SD_Speed_perc" class="gt_row gt_center gt_striped" style="background-color: #FEE11A;">4.2%</td>
+<td headers="MN8+ stub_1_10 SD_Speed_Target" class="gt_row gt_center gt_striped" style="background-color: #FEE11A;">2.0%</td>
+<td headers="MN8+ stub_1_10 Mean_Split" class="gt_row gt_center gt_striped" style="background-color: #FEE11A;">1:49.5</td>
+<td headers="MN8+ stub_1_10 SD_Split" class="gt_row gt_center gt_striped" style="background-color: #FEE11A;">4.28</td>
+<td headers="MN8+ stub_1_10 Avg_Target_S" class="gt_row gt_center gt_striped" style="background-color: #FEE11A;">1:26.5</td>
+<td headers="MN8+ stub_1_10 Mean_Rate" class="gt_row gt_center gt_striped" style="background-color: #FEE11A;">35.2</td>
+<td headers="MN8+ stub_1_10 SD_Rate" class="gt_row gt_center gt_striped" style="background-color: #FEE11A;">1.49</td>
+<td headers="MN8+ stub_1_10 Mean_EWpS" class="gt_row gt_center gt_striped" style="background-color: #FEE11A;">457.3</td>
+<td headers="MN8+ stub_1_10 SD_EWpS" class="gt_row gt_center gt_striped" style="background-color: #FEE11A;">43.77</td>
+<td headers="MN8+ stub_1_10 Target_EWpS" class="gt_row gt_center gt_striped" style="background-color: #FEE11A;">866</td></tr>
+    <tr><th id="summary_stub_MN8+_1" scope="row" class="gt_row gt_left gt_stub gt_summary_row gt_first_summary_row thick gt_last_summary_row">Average</th>
+<td headers="MN8+ summary_stub_MN8+_1 Mean_Speed" class="gt_row gt_center gt_summary_row gt_first_summary_row thick gt_last_summary_row">4.5</td>
+<td headers="MN8+ summary_stub_MN8+_1 SD_Speed_perc" class="gt_row gt_center gt_summary_row gt_first_summary_row thick gt_last_summary_row">4.3%</td>
+<td headers="MN8+ summary_stub_MN8+_1 SD_Speed_Target" class="gt_row gt_center gt_summary_row gt_first_summary_row thick gt_last_summary_row">2.0%</td>
+<td headers="MN8+ summary_stub_MN8+_1 Mean_Split" class="gt_row gt_center gt_summary_row gt_first_summary_row thick gt_last_summary_row">01:52</td>
+<td headers="MN8+ summary_stub_MN8+_1 SD_Split" class="gt_row gt_center gt_summary_row gt_first_summary_row thick gt_last_summary_row">4.7</td>
+<td headers="MN8+ summary_stub_MN8+_1 Avg_Target_S" class="gt_row gt_center gt_summary_row gt_first_summary_row thick gt_last_summary_row">01:28</td>
+<td headers="MN8+ summary_stub_MN8+_1 Mean_Rate" class="gt_row gt_center gt_summary_row gt_first_summary_row thick gt_last_summary_row">33.9</td>
+<td headers="MN8+ summary_stub_MN8+_1 SD_Rate" class="gt_row gt_center gt_summary_row gt_first_summary_row thick gt_last_summary_row">1.6</td>
+<td headers="MN8+ summary_stub_MN8+_1 Mean_EWpS" class="gt_row gt_center gt_summary_row gt_first_summary_row thick gt_last_summary_row">440.8</td>
+<td headers="MN8+ summary_stub_MN8+_1 SD_EWpS" class="gt_row gt_center gt_summary_row gt_first_summary_row thick gt_last_summary_row">46.1</td>
+<td headers="MN8+ summary_stub_MN8+_1 Target_EWpS" class="gt_row gt_center gt_summary_row gt_first_summary_row thick gt_last_summary_row">866.0</td></tr>
+  </tbody>
+  <tfoot class="gt_sourcenotes">
+    <tr>
+      <td class="gt_sourcenote" colspan="12">Data collected from NK CoxBox utilizing the <strong>NK Link Logbook</strong> functionality</td>
+    </tr>
+    <tr>
+      <td class="gt_sourcenote" colspan="12"><span style='background-color: #FEE11A'> Yellow highlighted </span>
+row indicates fastest time this year for that boat</td>
+    </tr>
+    <tr>
+      <td class="gt_sourcenote" colspan="12"><span style='background-color: #489D46'> Green highlighted </span>
+cell indicates lowest speed variation this year for that boat</td>
+    </tr>
+  </tfoot>
+  
+</table>
+</div>
+<p>  This table provided incredible insight for our team. We were able
+to see the average performance of each piece in the original data, but
+being able to see the variability in Speed, Split, Rate, and Effective
+Work per Stroke, and how that changed over the course of the season
+allowed us to target specific factors to help us increase our speed for
+the next race. Seeing the distribution in speed throughout the race was
+of particular interest. After reading an analysis of boat speed at the
+2022 U19 and U23 Worlds in Varese, Italy, I noticed how narrow the
+standard deviation in boat speed was and set our target speed deviation
+at 2% to approximate the results of the U23 athletes.</p>
+<blockquote>
+<p>By comparing the average race strategy of the winners across the 12
+comparable events (Fig.5), it was found that Olympic rowers had the most
+even distribution of their efforts during the race (SD=1.1%) with the
+relatively slowest start 500m section. Surprisingly, U19 rowers were the
+second most evenly distributed (SD=1.5%), with the U23 crews showed the
+most variable speed (SD=2.2%) with relatively faster start and finish
+500m sections.</p>
+<footer>
+<a
+href="https://www.row2k.com/features/5894/boat-speed-analysis-of-u19-and-u23-worlds-in-varese-by-dr-valery-kleshnev/">Boat
+Speed Analysis of U19 and U23 Worlds in Varese, by Dr. Valery
+Kleshnev</a>
+</footer>
+</blockquote>
+<p>  To examine this a little closer, I ran a simple linear regression
+of boat speed against the standard deviation of the speed within each
+race. I only used the Men’s Varsity 4+ and Men’s Novice 8+ values
+because their boat speeds were more similar, and it is known that the
+Men’s Team / Women’s Team difference will have an overwhelming effect on
+boat speed, and so the inclusion of the Women’s Novice 4+ data would
+greatly skew the results.</p>
+<p><img src="water_data_processing_files/figure-html/unnamed-chunk-4-1.png" width="100%" /></p>
+<p>  This is of course an <em>exceedingly small</em> data set (n=7), but
+the trend is quite clear and supports that a “more consistent” race
+correlates with a faster - at least within the ranges observed for these
+athletes. There may be changes once values start getting close to those
+of the World Champions, but further study would need to happen to answer
+that question.</p>
+<hr />
+</div>
+<div id="graphing" class="section level1">
+<h1>7. Graphing</h1>
+<p>  As good as the data table is, it was still a single line
+representation of a ~200+ part story. Visualizing the data was the clear
+next step. For demonstration, I’ll only use the data from the Men’s
+Varsity 4+.</p>
+<div id="graphing-split" class="section level2">
+<h2>7.1 Graphing Split</h2>
+<p>  Understanding the changes in speed over time is a powerful tool. I
+learned earlier that there seems to be a connection between lower
+standard deviations in speed and greater boat speed, and with a graph
+we’ll quickly get a sense of how consistent speed was throughout a race.
+Further, we will be able to examine each phase of the race to see which
+areas are going well and which areas we need to improve upon. Athletes
+often have a strong sense of where these areas are, but with a graph, we
+can quantify when and how much. Additionally, with a coxswain’s audio
+recording aligned to the graph, we can get a sense of what was happening
+when there were changes to the boat’s speed.</p>
+<p><img src="water_data_processing_files/figure-html/MV4%20Split-1.png" width="100%" /></p>
+<p>  With the insights from the article about boat speed at Worlds from
+Dr. Kleshnev, I included two horizontal lines on the graph that
+represent 2% faster than our average and 2% slower than our average. If
+the goal is to minimize variability, this would help us recognize which
+areas were falling too far out of our “safe zone.” Additionally, it’s
+good to know how far you are from your ultimate targets, so I included a
+gold line that corresponds with my estimate of a prognostic Gold Medal
+Time at nationals in that boat class.</p>
+<p>  For our MV4+ we were able to see that there was a slow down that
+happened during the 1,250 - 1,750 range. This was expected, as this is
+often the most psychologically challenging part of the race, but being
+able to point to exactly when and how much they were slowing aided in
+its reduction at ACRAs.</p>
+<p>  The big takeaway was that we learned they were going way too hard
+at the beginning for how fast they would end up going. This is
+colloquially known as a “fly and die.” We can see that in each race,
+they would quickly get to or even surpass the GMT pace, but would then
+fall of for the remainder of the first 500. While it is important to get
+off the line quickly, holding what was in some cases around 2k-5 to
+2K-10 for the first 500 meters likely bit them in the end. While they
+were not able to reduce the speed at the beginning of the race this
+season, they will likely find greater speed for the whole race with a
+slightly more conservative start next season.</p>
+<p> </p>
+</div>
+<div id="graphing-rate" class="section level2">
+<h2>7.2 Graphing Rate</h2>
+<p>  In the simple formula for speed, <em>Stroke Rate x Stroke Length =
+Speed</em>, rate “half” the input. Increasing the rate while maintaining
+stroke length will result in greater speed. Of course, we know in
+actuality it’s not possible to perfectly maintain length, but there are
+still certain rates that need to be achieved to be competitive in high
+level competition. The different phases of the races have different rate
+demands, and the full story may not always be accurately reflected in
+the piece average or even in the detailed view of the piece available on
+the cox boxes. Through visualization we can see the arc of the rate
+throughout the race and identify where we need to adjust to be more
+competitive.</p>
+<p><img src="water_data_processing_files/figure-html/Rate%20MV4-1.png" width="100%" /></p>
+<p>  The big thing we noticed with this group is that they weren’t
+hitting their target rates for the start. They were hoping to be in the
+low 40’s during the “highs” phase of the starting block, but were often
+in the high 30’s. Additionally, they weren’t holding their target rate
+of 38-39 in the sprint. More targeted work on max rate - both in the
+technical ability to stay together and the physiology to reach that
+level quickly - will likely results in better outcomes in the
+future.</p>
+<p>  Graphing rate also yielded some unexpected insights. While speed is
+collected through GPS data, rate is collected by sensing the surge of
+the boat. We know from the post-race meetings that the athletes weren’t
+suddenly rowing at a 26 or a 44 for a stroke or two before returning to
+baseline, so we initially believed these to be simple errors. However,
+by comparing the graph to the coxswain’s recording and everyone’s
+recollection of the race, we noticed that the points the athletes became
+the most frantic and were the least together correlated with the strange
+readings. The running hypothesis is that the cox box can’t differentiate
+a normal boat surge and a jolt from the rowers falling out of time, and
+so the errors are caused by the rowers rather than the equipment.
+Discussing this pattern with the athletes as well as practicing how to
+handle those high pressure moments of close racing helped them keep
+connected with each other for nationals.</p>
+<p> </p>
+</div>
+<div id="graphing-effective-work-per-stroke" class="section level2">
+<h2>7.3 Graphing Effective Work per Stroke</h2>
+<p>  Effective Work per Stroke is perhaps the most esoteric of the
+measures. Without a system to explicitly measure work per stroke, like
+the NK Empower Oar Lock, a little bit of hand waving needed to happen to
+make these graphs. We don’t know what the drag factor with this boat,
+these athletes, in these conditions was, and so to calculate power I
+simply used the Concept2 Ergometer drag factor value of 2.8. Whether the
+values were totally accurate or not, they still allow a “collapsing” of
+factors to see how well we’re performing regardless of how the rate
+fluctuates.</p>
+<p><img src="water_data_processing_files/figure-html/WPS%20MV4-1.png" width="100%" /></p>
+<p>  With the rate so low and the speed so fast at the start, the
+resultant work per stroke was much higher than the rest of the race.
+This visualization clearly shows that they were flying and dying rather
+than speed changing due to the shift in rate; and it’s likely that the
+rest of the race suffered for it. With the rate in the early phases not
+being significantly higher than the baseline, the real difference
+between the fast period in the first 500 meters that caused their
+increased speed was how hard they were going. Pushing too far or
+attempting to hold too long in the anaerobic zones greatly impacts the
+overall speed in a mostly aerobic race. Lowering the work per stroke in
+the starting block by increasing the rate, but slightly reducing the
+press, will likely result in an overall faster time and the ability to
+sprint faster at the end while preventing the rest of the pack from
+“leaving them at the line.”</p>
+</div>
+</div>
+<div id="conclusions" class="section level1">
+<h1>8. Conclusions</h1>
+<p>  Basic statistics and visualization allow teams to uncover insights
+about racing that would otherwise be invisible before processing. While
+the averages and detailed views of the data available directly on the
+device are useful, there is much of the story that they leave out. Once
+the information is processed and combined with other tools like coxswain
+recordings and the work of rowing’s scientific community, it can be used
+to generate specific, targeted changes to race strategy and training to
+allow for the best possible outcomes in future races.</p>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
